@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Lab3B</string>
+    <string name="ble_not_supported">BLE not supported</string>
+</resources>
