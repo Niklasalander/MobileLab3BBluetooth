@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -193,6 +194,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        StateHandler.initConnectionState(this);
 
         mHandler = new Handler();
 
@@ -203,7 +205,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mDeviceList.clear();
-                scanLeDevice(true);
+                Log.i("Asd", "click");
+                StateHandler.scanLeDevice(true);
             }
         });
 
@@ -222,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        initBLE();
+        StateHandler.initBLE();
     }
 
     // TODO ...
@@ -230,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         // stop scanning
-        scanLeDevice(false);
+        StateHandler.scanLeDevice(false);
         mDeviceList.clear();
         mAdapter.notifyDataSetChanged();
         // NB !release additional resources
@@ -253,5 +256,9 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.found_devices_msg, mDeviceList.size());
             mScanInfoView.setText(msg);
         }
+    }
+
+    public void setmScanInfoView(String msg) {
+        mScanInfoView.setText(msg);
     }
 }

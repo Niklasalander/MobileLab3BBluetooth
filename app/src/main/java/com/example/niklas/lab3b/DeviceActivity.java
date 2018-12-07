@@ -192,13 +192,11 @@ public class DeviceActivity extends AppCompatActivity {
 
             // We assume we receive a string from the Micro:bit
             final String msg = uartTxCharacteristic.getStringValue(0);
-            mHandler.post(new Runnable() {
-                public void run() {
+            mHandler.post(() -> {
 //                    showToast(msg);
-                    Log.i("uartMessage", msg);
-                    mDataView.setText(msg);
-                    dataHandler.newValue(msg);
-                }
+                Log.i("uartMessage", msg);
+                mDataView.setText(msg);
+                dataHandler.newValue(msg);
             });
         }
 
