@@ -1,9 +1,14 @@
 package com.example.niklas.lab3b;
 
+import android.bluetooth.BluetoothDevice;
+
 public class StateHandler {
     private static BTConnectionState btConnectionState;
     private StateHandler stateHandler;
 
+//    public StateHandler getInstance() {
+//        if (stateHandler == null)
+//    }
 
     public static void initConnectionState(MainActivity mainActivity) {
         btConnectionState = new ScanForDeviceState(mainActivity);
@@ -17,6 +22,21 @@ public class StateHandler {
     }
 
     public static void scanLeDevice(boolean enable) {
-        btConnectionState.scanLeDevice(enable);
+        if (btConnectionState != null)
+            btConnectionState.scanLeDevice(enable);
+    }
+
+    public static void onDeviceSelected(BluetoothDevice device) {
+        if (btConnectionState != null)
+            btConnectionState = btConnectionState.onDeviceSelected(device);
+    }
+
+    public static void connect(DeviceActivity deviceActivity) {
+        btConnectionState = btConnectionState.connect(deviceActivity);
+    }
+
+    public static void disconnectDevice() {
+        if (btConnectionState != null)
+            btConnectionState = btConnectionState.disconnectDevice();
     }
 }

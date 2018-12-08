@@ -1,4 +1,144 @@
 package com.example.niklas.lab3b;
 
-public class ConnectedState {
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.bluetooth.BluetoothProfile;
+import android.os.Handler;
+import android.util.Log;
+
+import java.util.List;
+
+public class ConnectedState extends SelectedDeviceState {
+
+    public ConnectedState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice device, Handler handler) {
+        super(mainActivity, mBluetoothAdapter, device, handler);
+        if (connectedDevice != null) {
+            // register call backs for bluetooth gatt
+            mBluetoothGatt = connectedDevice.connectGatt(deviceActivity, false, mBtGattCallback);
+            Log.i("connecters", "connectGatt called");
+        }
+    }
+
+    /**
+     * Callbacks for bluetooth gatt changes/updates
+     * The documentation is not clear, but (some of?) the callback methods seems to
+     * be executed on a worker thread - hence use a Handler when updating the ui.
+     */
+    private BluetoothGattCallback mBtGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.i("BluetoothGattCallback", "onConnectionStateChange");
+
+            if (newState == BluetoothGatt.STATE_CONNECTED) {
+                Log.i("BluetoothGattCallback", "new state conn");
+                mBluetoothGatt = gatt;
+                gatt.discoverServices();
+                handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.connected_msg)));
+            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.i("BluetoothGattCallback", "new state diss");
+                mBluetoothGatt = null;
+                handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.disconnected_msg)));
+                StateHandler.disconnectDevice();
+            }
+        }
+
+        @Override
+        public void onServicesDiscovered(final BluetoothGatt gatt, int status) {
+            Log.i("BluetoothGattCallback", "onServicesDiscovered");
+
+            if (status == BluetoothGatt.GATT_SUCCESS) {
+                // debug, list services
+//                BleLogger.logServices(gatt.getServices());
+                List<BluetoothGattService> list = gatt.getServices();
+                for (BluetoothGattService s : list) {
+                    Log.i("mUartService", s.toString() + " | " + s.getUuid());
+                }
+                // Get the UART service
+                mUartService = gatt.getService(UARTSERVICE_SERVICE_UUID);
+                Log.i("mUartService",
+                        mUartService==null? "null" : mUartService.getUuid().toString() );
+
+                if (mUartService != null) {
+                    // debug, list characteristics
+//                    BleLogger.logCharacteristicsForService(mUartService);
+
+                    // Enable indications for UART data
+                    // 1. Enable notification/indication on ble peripheral (Micro:bit)
+                    BluetoothGattCharacteristic txCharac =
+                            mUartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+                    BluetoothGattDescriptor descriptor =
+                            txCharac.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+                    mBluetoothGatt.writeDescriptor(descriptor);
+
+                    // 2. Enable indications/notification locally (this android device)
+                    mBluetoothGatt.setCharacteristicNotification(txCharac, true);
+                    Log.i("onServiceDiscovered", "notification/indication set");
+                } else {
+                    handler.post(() -> showToast("Uart-data characteristic not found"));
+                    StateHandler.disconnectDevice();
+                }
+            }
+        }
+
+        @Override
+        public void onDescriptorWrite(final BluetoothGatt gatt, BluetoothGattDescriptor
+                descriptor, int status) {
+            Log.i("BluetoothGattCallback", "onDescriptorWrite");
+
+            Log.i("onDescriptorWrite", "descriptor " + descriptor.getUuid());
+            Log.i("onDescriptorWrite", "status " + status);
+
+            if (CLIENT_CHARACTERISTIC_CONFIG.equals(descriptor.getUuid()) &&
+                    status == BluetoothGatt.GATT_SUCCESS) {
+
+                handler.post(() -> {
+                    showToast("Uart-data notifications enabled");
+                    deviceActivity.setmDeviceText(deviceActivity.getString(R.string.uart_sensor_info));
+                });
+            }
+        }
+
+        /**
+         * Callback called on characteristic changes, e.g. when a data value is changed.
+         * This is where we receive notifications on updates of accelerometer data.
+         */
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic
+                characteristic) {
+            Log.i("BluetoothGattCallback", "onCharacteristicChanged: " + characteristic.toString());
+
+            // TODO: check which service and characteristic caused this call
+            BluetoothGattCharacteristic uartTxCharacteristic =
+                    mUartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+
+            // We assume we receive a string from the Micro:bit
+            final String msg = uartTxCharacteristic.getStringValue(0);
+            handler.post(() -> {
+//                    showToast(msg);
+                Log.i("uartMessage", msg);
+                deviceActivity.setmDataText(msg);
+                dataHandler.newValue(msg);
+            });
+        }
+
+        @Override
+        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic
+                characteristic, int status) {
+            Log.i("BluetoothGattCallback",
+                    "onCharacteristicWrite: " + characteristic.getUuid().toString());
+        }
+
+        @Override
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic
+                characteristic, int status) {
+            Log.i("BluetoothGattCallback",
+                    "onCharacteristicRead: " + characteristic.getUuid().toString());
+        }
+    };
 }

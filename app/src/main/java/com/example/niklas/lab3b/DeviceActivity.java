@@ -47,47 +47,52 @@ public class DeviceActivity extends AppCompatActivity {
     public static final UUID TEST = // transmit data (!)
             UUID.fromString("e97dd91d-251d-470a-a062-fa1922dfa9a8");
 
-    private BluetoothDevice mConnectedDevice = null;
-    private BluetoothGatt mBluetoothGatt = null;
+//    private BluetoothDevice mConnectedDevice = null;
+//    private BluetoothGatt mBluetoothGatt = null;
 
-    private BluetoothGattService mUartService = null;
+//    private BluetoothGattService mUartService = null;
 
     private Handler mHandler; // callbacks executed on background thread (it seems)
 
     @Override
     protected void onStart() {
         super.onStart();
-        mConnectedDevice = ConnectedDevice.getInstance();
-        if (mConnectedDevice != null) {
-            mDeviceView.setText(mConnectedDevice.toString());
-            connect();
-        }
+
+//        mConnectedDevice = ConnectedDevice.getInstance();
+        StateHandler.connect(this);
+//        if (mConnectedDevice != null) {
+
+//            connect();
+//        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        StateHandler.disconnectDevice();
+        finish();
+/*        super.onStop();
         if (mBluetoothGatt != null) {
             mBluetoothGatt.close();
         }
         ConnectedDevice.removeInstance();
         mConnectedDevice = null;
-        finish();
+        finish();*/
     }
 
-    private void connect() {
+ /*   private void connect() {
         if (mConnectedDevice != null) {
             // register call backs for bluetooth gatt
-            mBluetoothGatt = mConnectedDevice.connectGatt(this, false, mBtGattCallback);
+//            mBluetoothGatt = mConnectedDevice.connectGatt(this, false, mBtGattCallback);
             Log.i("connecters", "connectGatt called");
         }
     }
 
-    /**
+    *//**
      * Callbacks for bluetooth gatt changes/updates
      * The documentation is not clear, but (some of?) the callback methods seems to
      * be executed on a worker thread - hence use a Handler when updating the ui.
-     */
+     *//*
     private BluetoothGattCallback mBtGattCallback = new BluetoothGattCallback() {
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
@@ -177,10 +182,10 @@ public class DeviceActivity extends AppCompatActivity {
             }
         }
 
-        /**
+        *//**
          * Callback called on characteristic changes, e.g. when a data value is changed.
          * This is where we receive notifications on updates of accelerometer data.
-         */
+         *//*
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic
                 characteristic) {
@@ -198,7 +203,7 @@ public class DeviceActivity extends AppCompatActivity {
                 mDataView.setText(msg);
                 dataHandler.newValue(msg);
             });
-        }
+
 
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic
@@ -213,12 +218,12 @@ public class DeviceActivity extends AppCompatActivity {
             Log.i("BluetoothGattCallback",
                     "onCharacteristicRead: " + characteristic.getUuid().toString());
         }
-    };
+    };}*/
 
     // Below: gui stuff...
     private TextView mDeviceView;
     private TextView mDataView;
-    private DataHandler dataHandler;
+//    private DataHandler dataHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,12 +232,20 @@ public class DeviceActivity extends AppCompatActivity {
 
         mDeviceView = findViewById(R.id.deviceView);
         mDataView = findViewById(R.id.dataView);
-        dataHandler = DataHandler.getInstance();
+//        dataHandler = DataHandler.getInstance();
         mHandler = new Handler();
     }
 
     protected void showToast(String msg) {
         Toast toast = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    public void setmDeviceText(String s) {
+        mDeviceView.setText(s);
+    }
+
+    public void setmDataText(String s) {
+        mDataView.setText(s);
     }
 }

@@ -24,6 +24,7 @@ public class ScanForDeviceState extends BTConnectionState {
         super(mainActivity);
     }
 
+    @Override
     public boolean initBLE() {
         if (!mainActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             handler.post(() -> showToast("BLE is not supported"));
@@ -58,6 +59,7 @@ public class ScanForDeviceState extends BTConnectionState {
     /*
      * Scan for BLE devices.
      */
+    @Override
     public void scanLeDevice(final boolean enable) {
         if (enable) {
             if (!mScanning) {
@@ -91,24 +93,25 @@ public class ScanForDeviceState extends BTConnectionState {
         }
     }
 
+    @Override
+    public BTConnectionState onDeviceSelected(BluetoothDevice device) {
+//        ConnectedDevice.setInstance(device);
+        ConnectedDevice.setInstance(device);
+        showToast(ConnectedDevice.getInstance().toString());
+        Intent intent = new Intent(mainActivity, DeviceActivity.class);
+        mainActivity.startActivity(intent);
+        return new IsConnectingState(mainActivity, mBluetoothAdapter, device, handler);
+    }
+
     /**
      * Implementation of the device scan callback.
      * Only adding devices matching name BBC_MICRO_BIT.
      */
     private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi,
-                                     byte[] scanRecord) {
-                    Log.i("Asd", "asd");
-                    mainActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i("Asd", "qwe");
-                            String name = device.getName();
-                            mainActivity.newDeviceFound(name, device);
-                        }
-                    });
-                }
+            (device, rssi, scanRecord) -> {
+                mainActivity.runOnUiThread(() -> {
+                    String name = device.getName();
+                    mainActivity.newDeviceFound(name, device);
+                });
             };
 }

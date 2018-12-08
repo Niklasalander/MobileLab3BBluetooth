@@ -38,7 +38,7 @@ public class DataHandler {
         reset();
     }
 
-    private void reset() {
+    public void reset() {
         bpmTimer = Calendar.getInstance().getTimeInMillis();
         lastBeat = Calendar.getInstance().getTimeInMillis();
         bpmcounter = 0;

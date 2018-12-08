@@ -58,6 +58,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView mScanInfoView;
 
     private void initBLE() {
+        if (!StateHandler.initBLE()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        }
+    }
+
+/*    private void initBLE() {
         if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             showToast("BLE is not supported");
             finish();
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-    }
+    }*/
 
     // callback for ActivityCompat.requestPermissions
     @Override
@@ -119,16 +126,18 @@ public class MainActivity extends AppCompatActivity {
 
     // device selected, start DeviceActivity (displaying data)
     private void onDeviceSelected(int position) {
-        ConnectedDevice.setInstance(mDeviceList.get(position));
+        // Not tested
+        StateHandler.onDeviceSelected(mDeviceList.get(position));
+/*        ConnectedDevice.setInstance(mDeviceList.get(position));
         showToast(ConnectedDevice.getInstance().toString());
         Intent intent = new Intent(MainActivity.this, DeviceActivity.class);
-        startActivity(intent);
+        startActivity(intent);*/
     }
 
     /*
      * Scan for BLE devices.
      */
-    private void scanLeDevice(final boolean enable) {
+/*    private void scanLeDevice(final boolean enable) {
         if (enable) {
             if (!mScanning) {
                 // stop scanning after a pre-defined scan period, SCAN_PERIOD
@@ -157,13 +166,13 @@ public class MainActivity extends AppCompatActivity {
                 showToast("BLE scan stopped");
             }
         }
-    }
+    }*/
 
     /**
      * Implementation of the device scan callback.
      * Only adding devices matching name BBC_MICRO_BIT.
      */
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
+/*    private BluetoothAdapter.LeScanCallback mLeScanCallback =
             new BluetoothAdapter.LeScanCallback() {
                 @Override
                 public void onLeScan(final BluetoothDevice device, int rssi,
@@ -184,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-            };
+            };*/
 
     /**
      * Below: Manage activity, and hence bluetooth, life cycle,
@@ -225,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        StateHandler.initBLE();
+        initBLE();
     }
 
     // TODO ...
