@@ -1,10 +1,15 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattService;
 import android.os.Handler;
+
+import com.example.niklas.lab3b.DataHandler;
+import com.example.niklas.lab3b.DeviceActivity;
+import com.example.niklas.lab3b.MainActivity;
+import com.example.niklas.lab3b.R;
 
 import java.util.UUID;
 
@@ -19,6 +24,7 @@ public class SelectedDeviceState extends BTConnectionState {
             UUID.fromString("6E400003-B5A3-F393-E0A9-E50E24DCCA9E");
     public static final UUID TEST = // transmit data (!)
             UUID.fromString("e97dd91d-251d-470a-a062-fa1922dfa9a8");
+
     protected DeviceActivity deviceActivity;
     protected BluetoothGatt mBluetoothGatt = null;
     protected BluetoothGattService mUartService = null;
@@ -29,6 +35,7 @@ public class SelectedDeviceState extends BTConnectionState {
         dataHandler = DataHandler.getInstance();
     }
 
+    @Override
     public BTConnectionState connect(DeviceActivity deviceActivity) {
         return this;
     }
@@ -46,4 +53,13 @@ public class SelectedDeviceState extends BTConnectionState {
         return super.disconnectDevice();
     }
 
+    @Override
+    public void stopTransfer() {
+        if (mBluetoothGatt != null) {
+            mBluetoothGatt.disconnect();
+            if (dataHandler != null)
+                dataHandler.reset();
+            handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.no_bpm_available)));
+        }
+    }
 }

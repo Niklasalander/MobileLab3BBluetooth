@@ -11,4 +11,8 @@
     <string name="disconnected_msg">Disconnected</string>
     <string name="waiting_for_device">Waiting for device...</string>
     <string name="waiting_for_connection">Waiting for connection...</string>
+    <string name="no_bpm_available">No stable BPM found</string>
+    <string name="start_transfer_button">Start</string>
+    <string name="stop_transfer_button">Stop</string>
+    <string name="to_much_noise">To much noise, pausing transfer</string>
 </resources>

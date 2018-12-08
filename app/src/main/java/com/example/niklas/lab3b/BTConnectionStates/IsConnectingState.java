@@ -1,9 +1,12 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.os.Handler;
 import android.util.Log;
+
+import com.example.niklas.lab3b.DeviceActivity;
+import com.example.niklas.lab3b.MainActivity;
 
 
 public class IsConnectingState extends SelectedDeviceState {

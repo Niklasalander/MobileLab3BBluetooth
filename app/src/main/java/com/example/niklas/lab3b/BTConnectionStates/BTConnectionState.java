@@ -1,11 +1,12 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattService;
 import android.os.Handler;
 import android.widget.Toast;
+
+import com.example.niklas.lab3b.DeviceActivity;
+import com.example.niklas.lab3b.MainActivity;
 
 
 public class BTConnectionState {
@@ -56,5 +57,13 @@ public class BTConnectionState {
         connectedDevice = null;
         ConnectedDevice.removeInstance();
         return new ScanForDeviceState(mainActivity);
+    }
+
+    public void startTransfer() {
+
+    }
+
+    public void stopTransfer() {
+
     }
 }

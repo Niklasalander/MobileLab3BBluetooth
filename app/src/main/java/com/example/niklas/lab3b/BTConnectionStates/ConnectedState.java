@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,10 +11,16 @@ import android.bluetooth.BluetoothProfile;
 import android.os.Handler;
 import android.util.Log;
 
+import com.example.niklas.lab3b.MainActivity;
+import com.example.niklas.lab3b.NoiseTimeout;
+import com.example.niklas.lab3b.R;
+import com.example.niklas.lab3b.StateHandler;
+
 import java.util.List;
+import java.util.Timer;
 
 public class ConnectedState extends SelectedDeviceState {
-
+    protected static final int NOISE_TIMEOUT_TIME = 2000;
     public ConnectedState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice device, Handler handler) {
         super(mainActivity, mBluetoothAdapter, device, handler);
         if (connectedDevice != null) {
@@ -123,7 +129,11 @@ public class ConnectedState extends SelectedDeviceState {
 //                    showToast(msg);
                 Log.i("uartMessage", msg);
                 deviceActivity.setmDataText(msg);
-                dataHandler.newValue(msg);
+                if (!dataHandler.newValue(msg)) {
+                    //start timer
+                    initTimeout();
+                }
+
             });
         }
 
@@ -141,4 +151,21 @@ public class ConnectedState extends SelectedDeviceState {
                     "onCharacteristicRead: " + characteristic.getUuid().toString());
         }
     };
+
+    @Override
+    public void startTransfer() {
+        if (mBluetoothGatt != null) {
+            if (mBluetoothGatt.getConnectionState(connectedDevice) == BluetoothGatt.STATE_DISCONNECTED)
+                mBluetoothGatt.connect();
+        }
+    }
+
+    private void initTimeout() {
+        stopTransfer();
+        handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.to_much_noise)));
+        NoiseTimeout noiseTimeout = new NoiseTimeout();
+        Timer timer = new Timer();
+        timer.schedule(noiseTimeout, NOISE_TIMEOUT_TIME);
+    }
+
 }

@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class DeviceActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        bpmTextView.setText(getString(R.string.no_bpm_available));
 //        mConnectedDevice = ConnectedDevice.getInstance();
         StateHandler.connect(this);
 //        if (mConnectedDevice != null) {
@@ -223,6 +224,9 @@ public class DeviceActivity extends AppCompatActivity {
     // Below: gui stuff...
     private TextView mDeviceView;
     private TextView mDataView;
+    private TextView bpmTextView;
+    private Button startTransferButton;
+    private Button stopTransferButton;
 //    private DataHandler dataHandler;
 
     @Override
@@ -232,8 +236,21 @@ public class DeviceActivity extends AppCompatActivity {
 
         mDeviceView = findViewById(R.id.deviceView);
         mDataView = findViewById(R.id.dataView);
+        bpmTextView = findViewById(R.id.bpmView);
+        startTransferButton = findViewById(R.id.startTransferButton);
+        startTransferButton.setOnClickListener(event -> handleStartTransfer());
+        stopTransferButton = findViewById(R.id.stopTransferButton);
+        stopTransferButton.setOnClickListener(event -> handleStopTransfer());
 //        dataHandler = DataHandler.getInstance();
         mHandler = new Handler();
+    }
+
+    private void handleStartTransfer() {
+
+    }
+
+    private void handleStopTransfer() {
+
     }
 
     protected void showToast(String msg) {
@@ -247,5 +264,9 @@ public class DeviceActivity extends AppCompatActivity {
 
     public void setmDataText(String s) {
         mDataView.setText(s);
+    }
+
+    public void setBpmTextView(String s) {
+
     }
 }

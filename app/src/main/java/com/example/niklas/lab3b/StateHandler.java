@@ -2,6 +2,9 @@ package com.example.niklas.lab3b;
 
 import android.bluetooth.BluetoothDevice;
 
+import com.example.niklas.lab3b.BTConnectionStates.BTConnectionState;
+import com.example.niklas.lab3b.BTConnectionStates.ScanForDeviceState;
+
 public class StateHandler {
     private static BTConnectionState btConnectionState;
     private StateHandler stateHandler;
@@ -38,5 +41,16 @@ public class StateHandler {
     public static void disconnectDevice() {
         if (btConnectionState != null)
             btConnectionState = btConnectionState.disconnectDevice();
+    }
+
+    public static void stopTransfer() {
+        if (btConnectionState != null)
+            btConnectionState.stopTransfer();
+    }
+
+    public static void startTransfer() {
+        if (btConnectionState != null) {
+            btConnectionState.startTransfer();
+        }
     }
 }

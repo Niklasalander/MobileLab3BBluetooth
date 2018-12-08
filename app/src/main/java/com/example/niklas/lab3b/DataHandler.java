@@ -55,7 +55,7 @@ public class DataHandler {
         return dataHandler;
     }
 
-    public int newValue(String valueStr) {
+    public boolean newValue(String valueStr) {
         String[] res = valueStr.split(" ");
         int newSequenceNr = Integer.parseInt(res[0]);
         int newValueNr = Integer.parseInt(res[1]);
@@ -104,7 +104,10 @@ public class DataHandler {
 //        Log.i("BPM", "bpm time : " + (Calendar.getInstance().getTimeInMillis() - bpmTimer));
 //        Log.i("BPM", "lst time : " + (Calendar.getInstance().getTimeInMillis() - lastBeat));
 
-        return 0;
+        /* If not beat within 10 seconds, abort */
+        if (Calendar.getInstance().getTimeInMillis() - lastBeat > 10000)
+            return false;
+        return true;
     }
 
     private void setDefaultThresholds() {

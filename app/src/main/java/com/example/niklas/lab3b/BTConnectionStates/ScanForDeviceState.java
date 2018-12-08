@@ -1,16 +1,17 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.BTConnectionStates;
 
 import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 
+
+import com.example.niklas.lab3b.DeviceActivity;
+import com.example.niklas.lab3b.MainActivity;
+import com.example.niklas.lab3b.R;
 
 import static com.example.niklas.lab3b.MainActivity.REQUEST_ACCESS_LOCATION;
 
@@ -97,10 +98,11 @@ public class ScanForDeviceState extends BTConnectionState {
     public BTConnectionState onDeviceSelected(BluetoothDevice device) {
 //        ConnectedDevice.setInstance(device);
         ConnectedDevice.setInstance(device);
+        connectedDevice = ConnectedDevice.getInstance();
         showToast(ConnectedDevice.getInstance().toString());
         Intent intent = new Intent(mainActivity, DeviceActivity.class);
         mainActivity.startActivity(intent);
-        return new IsConnectingState(mainActivity, mBluetoothAdapter, device, handler);
+        return new IsConnectingState(mainActivity, mBluetoothAdapter, connectedDevice, handler);
     }
 
     /**
