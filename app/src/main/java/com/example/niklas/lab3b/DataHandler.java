@@ -12,7 +12,9 @@ public class DataHandler {
     private static final int minThresTopDefault = 650;
     private static final int minThresLowDefault = 400;
     private static final int averageThresDefault = 650;
+    private static final int LIST_SIZE = 20;
     private static DataHandler dataHandler;
+    private int prevSequenceNr;
     private int bpm;
     private long lastBeat;
     private long bpmTimer;
@@ -30,6 +32,7 @@ public class DataHandler {
     private double averageThres;
 
     private ArrayList<Double> list;
+    private ArrayList<Integer> sequenceNrList;
 
     private static final double FILTER = 0.8;
 
@@ -46,6 +49,7 @@ public class DataHandler {
         stPrior = 1;
         bpm = 0;
         list = new ArrayList<>();
+        sequenceNrList = new ArrayList<>();
         setDefaultThresholds();
     }
 
@@ -57,6 +61,10 @@ public class DataHandler {
 
     public boolean newValue(String valueStr) {
         String[] res = valueStr.split(" ");
+        if (res.length != 2) {
+            Log.i("DataHandler", "Received data does not include sequenceNr and value");
+            return false;
+        }
         int newSequenceNr = Integer.parseInt(res[0]);
         int newValueNr = Integer.parseInt(res[1]);
 
@@ -64,9 +72,11 @@ public class DataHandler {
         stPrior = stCurrent;
 
         list.add(stCurrent);
-
         if (list.size() > 20)
             list.remove(0);
+        sequenceNrList.add(newSequenceNr);
+        if (sequenceNrList.size() > 20)
+            sequenceNrList.remove(0);
         double maxValue = Collections.max(list);
         double minValue = Collections.min(list);
         double averageValue = getAverage(list);
@@ -103,11 +113,33 @@ public class DataHandler {
         Log.i("Stcur", "stcurrent : " + stCurrent);
 //        Log.i("BPM", "bpm time : " + (Calendar.getInstance().getTimeInMillis() - bpmTimer));
 //        Log.i("BPM", "lst time : " + (Calendar.getInstance().getTimeInMillis() - lastBeat));
-
-        /* If not beat within 10 seconds, abort */
-        if (Calendar.getInstance().getTimeInMillis() - lastBeat > 10000)
+        if (tooManyDroppedPackets()) {
+            Log.i("DataHandler", "Too many dropped packets, returning false");
             return false;
+        }
+
+        if (Calendar.getInstance().getTimeInMillis() - lastBeat > 10000) {
+            Log.i("DataHandler", "No beat found in 10 seconds, too much noise returing false");
+            return false;
+        }
         return true;
+    }
+
+    private boolean tooManyDroppedPackets() {
+        if (sequenceNrList.size() <= 0)
+            return false;
+        int counter = 0;
+        int prev = sequenceNrList.get(0);
+        for (int i = 1; i < sequenceNrList.size(); i++) {
+            int next = sequenceNrList.get(i);
+            Log.i("Counter", "Prev: " + prev + " Next: " + next);
+            if (next != (prev + 1))
+                counter++;
+            prev = next;
+        }
+        if (counter >= 6)
+            return true;
+        return false;
     }
 
     private void setDefaultThresholds() {
