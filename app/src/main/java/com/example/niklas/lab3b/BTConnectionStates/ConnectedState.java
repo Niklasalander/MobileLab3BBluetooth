@@ -19,6 +19,9 @@ import com.example.niklas.lab3b.StateHandler;
 import java.util.List;
 import java.util.Timer;
 
+/**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
+ */
 public class ConnectedState extends SelectedDeviceState {
     protected static final int NOISE_TIMEOUT_TIME = 2000;
     public ConnectedState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice device, Handler handler) {

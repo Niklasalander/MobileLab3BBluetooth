@@ -11,6 +11,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+/**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
+ */
 class BTDeviceArrayAdapter extends ArrayAdapter<BluetoothDevice> {
 
     BTDeviceArrayAdapter(Context context, List<BluetoothDevice> deviceList) {
