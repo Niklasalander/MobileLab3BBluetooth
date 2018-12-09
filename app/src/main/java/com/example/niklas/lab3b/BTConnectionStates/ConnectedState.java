@@ -154,9 +154,29 @@ public class ConnectedState extends SelectedDeviceState {
 
     @Override
     public void startTransfer() {
-        if (mBluetoothGatt != null) {
+/*        if (mBluetoothGatt != null) {
             if (mBluetoothGatt.getConnectionState(connectedDevice) == BluetoothGatt.STATE_DISCONNECTED)
                 mBluetoothGatt.connect();
+        }*/
+        if (mBluetoothGatt != null && mUartService != null) {
+            BluetoothGattCharacteristic txCharac =
+                    mUartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+            BluetoothGattDescriptor descriptor =
+                    txCharac.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+            descriptor.setValue(BluetoothGattDescriptor.ENABLE_INDICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
+        }
+    }
+
+    @Override
+    public void stopTransfer() {
+        if (mBluetoothGatt != null && mUartService != null) {
+            BluetoothGattCharacteristic txCharac =
+                    mUartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
+            BluetoothGattDescriptor descriptor =
+                    txCharac.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
+            descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
+            mBluetoothGatt.writeDescriptor(descriptor);
         }
     }
 

@@ -246,11 +246,11 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void handleStartTransfer() {
-
+        StateHandler.startTransfer();
     }
 
     private void handleStopTransfer() {
-
+        StateHandler.stopTransfer();
     }
 
     protected void showToast(String msg) {
