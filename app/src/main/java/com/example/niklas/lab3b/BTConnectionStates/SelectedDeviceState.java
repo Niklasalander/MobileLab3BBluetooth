@@ -37,6 +37,12 @@ public class SelectedDeviceState extends BTConnectionState {
         dataHandler = DataHandler.getInstance();
     }
 
+    public SelectedDeviceState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice connectedDevice, Handler handler, DeviceActivity deviceActivity) {
+        super(mainActivity, mBluetoothAdapter, connectedDevice, handler);
+        this.deviceActivity = deviceActivity;
+        dataHandler = DataHandler.getInstance();
+    }
+
     @Override
     public BTConnectionState connect(DeviceActivity deviceActivity) {
         return this;

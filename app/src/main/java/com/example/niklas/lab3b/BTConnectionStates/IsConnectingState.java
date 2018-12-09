@@ -21,7 +21,7 @@ public class IsConnectingState extends SelectedDeviceState {
             super.deviceActivity = deviceActivity;
             handler.post(() -> deviceActivity.setmDeviceText(connectedDevice.toString()));
             Log.i("connecters", "connectGatt called");
-            return new ConnectedState(mainActivity, mBluetoothAdapter, connectedDevice, handler);
+            return new ConnectedState(mainActivity, mBluetoothAdapter, connectedDevice, handler,deviceActivity);
         }
         Log.i("connecters", "No connected device, could not connect");
         deviceActivity.finish();

@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothProfile;
 import android.os.Handler;
 import android.util.Log;
 
+import com.example.niklas.lab3b.DeviceActivity;
 import com.example.niklas.lab3b.MainActivity;
 import com.example.niklas.lab3b.NoiseTimeout;
 import com.example.niklas.lab3b.R;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Timer;
 
 public class ConnectedState extends SelectedDeviceState {
+
     protected static final int NOISE_TIMEOUT_TIME = 2000;
     public ConnectedState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice device, Handler handler) {
         super(mainActivity, mBluetoothAdapter, device, handler);
@@ -28,6 +30,15 @@ public class ConnectedState extends SelectedDeviceState {
             mBluetoothGatt = connectedDevice.connectGatt(deviceActivity, false, mBtGattCallback);
             Log.i("connecters", "connectGatt called");
         }
+    }
+    public ConnectedState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice connectedDevice, Handler handler, DeviceActivity deviceActivity) {
+        super(mainActivity, mBluetoothAdapter, connectedDevice, handler,deviceActivity);
+        if (connectedDevice != null) {
+            // register call backs for bluetooth gatt
+            mBluetoothGatt = connectedDevice.connectGatt(deviceActivity, false, mBtGattCallback);
+            Log.i("connecters", "connectGatt called");
+        }
+
     }
 
     /**
@@ -47,6 +58,7 @@ public class ConnectedState extends SelectedDeviceState {
                 handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.connected_msg)));
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i("BluetoothGattCallback", "new state diss");
+                connectedDevice.connectGatt(mainActivity,true,mBtGattCallback);
                 mBluetoothGatt = null;
                 handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.disconnected_msg)));
                 StateHandler.disconnectDevice();
@@ -145,6 +157,8 @@ public class ConnectedState extends SelectedDeviceState {
                     "onCharacteristicRead: " + characteristic.getUuid().toString());
         }
     };
+
+
 
     @Override
     public void startTransfer() {
