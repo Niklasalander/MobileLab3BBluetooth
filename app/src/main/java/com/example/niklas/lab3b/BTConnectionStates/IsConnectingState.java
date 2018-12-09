@@ -8,7 +8,9 @@ import android.util.Log;
 import com.example.niklas.lab3b.DeviceActivity;
 import com.example.niklas.lab3b.MainActivity;
 
-
+/**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
+ */
 public class IsConnectingState extends SelectedDeviceState {
     public IsConnectingState(MainActivity mainActivity, BluetoothAdapter mBluetoothAdapter, BluetoothDevice device, Handler handler) {
         super(mainActivity, mBluetoothAdapter, device, handler);

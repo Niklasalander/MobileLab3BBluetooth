@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
+/**
+ * A Data handler used to find the BPM of data coming from a pulse meter.
+ */
 public class DataHandler {
     private static final int maxThresTopDefault = 850;
     private static final int maxThresLowDefault = 500;
@@ -40,6 +43,9 @@ public class DataHandler {
         reset();
     }
 
+    /**
+     * Resets the data handler to its original state.
+     */
     public void reset() {
         bpmTimer = Calendar.getInstance().getTimeInMillis();
         lastBeat = Calendar.getInstance().getTimeInMillis();
@@ -142,6 +148,10 @@ public class DataHandler {
         return bpm;
     }
 
+    /**
+     * If more than 6 packets were dropped in the current array return true.
+     * @return Returns true or more than 6 packets were dropped.
+     */
     private boolean tooManyDroppedPackets() {
         if (sequenceNrList.size() <= 0)
             return false;
@@ -159,6 +169,9 @@ public class DataHandler {
         return false;
     }
 
+    /**
+     * Sets the thresholdvalues to the default thresholdvalues.
+     */
     private void setDefaultThresholds() {
         maxThresTop = maxThresTopDefault;
         maxThresLow =  maxThresLowDefault;
@@ -168,7 +181,11 @@ public class DataHandler {
         bpm = 0;
     }
 
-
+    /**
+     * Gets the average number of an array of numbers.
+     * @param list The array with the numbers.
+     * @return The average number of the arryay.
+     */
     private double getAverage(ArrayList<Double> list) {
         double sum = 0;
         for (Double d : list)

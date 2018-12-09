@@ -15,6 +15,9 @@ import com.example.niklas.lab3b.R;
 
 import static com.example.niklas.lab3b.MainActivity.REQUEST_ACCESS_LOCATION;
 
+/**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
+ */
 public class ScanForDeviceState extends BTConnectionState {
     private static final long SCAN_PERIOD = 5000;
 //    private Handler handler;

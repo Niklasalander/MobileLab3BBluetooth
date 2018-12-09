@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
  * This is where we manage the BLE device and the corresponding services, characteristics et c.
  * BluetoothGattCallback.onCharacteristicChanged receives some text data from the Micro:bit
  * and displays it.

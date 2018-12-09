@@ -3,6 +3,7 @@ package com.example.niklas.lab3b.BTConnectionStates;
 import android.bluetooth.BluetoothDevice;
 
 /**
+ * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
  * An ugly hack to administrate the selected Bluetooth device
  * between activities.
  */

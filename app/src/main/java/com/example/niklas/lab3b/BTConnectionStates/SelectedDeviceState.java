@@ -15,6 +15,9 @@ import com.example.niklas.lab3b.R;
 
 import java.util.UUID;
 
+/**
+ *  * Code is based on https://github.com/anderslmatkthdotse/MicrobitUART
+ */
 public class SelectedDeviceState extends BTConnectionState {
     public static final UUID CLIENT_CHARACTERISTIC_CONFIG =
             UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
