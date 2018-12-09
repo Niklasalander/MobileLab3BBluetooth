@@ -44,10 +44,11 @@ public class SelectedDeviceState extends BTConnectionState {
 
     @Override
     public BTConnectionState disconnectDevice() {
-        if (mBluetoothGatt != null) {
+        stopTransfer();
+        if (mBluetoothGatt != null)
             mBluetoothGatt.disconnect();
+        if (mBluetoothGatt != null)
             mBluetoothGatt.close();
-        }
         if (dataHandler != null)
             dataHandler.reset();
         if (deviceActivity != null)
@@ -65,6 +66,7 @@ public class SelectedDeviceState extends BTConnectionState {
             mBluetoothGatt.writeDescriptor(descriptor);
         }
     }
+
 /*    @Override
     public void stopTransfer() {
         if (mBluetoothGatt != null) {

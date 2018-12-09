@@ -126,14 +126,8 @@ public class ConnectedState extends SelectedDeviceState {
             // We assume we receive a string from the Micro:bit
             final String msg = uartTxCharacteristic.getStringValue(0);
             handler.post(() -> {
-//                    showToast(msg);
                 Log.i("uartMessage", msg);
-                deviceActivity.setmDataText(msg);
-                if (!dataHandler.newValue(msg)) {
-                    //start timer
-                    initTimeout();
-                }
-
+                handleBPMValue(dataHandler.newValue(msg));
             });
         }
 
@@ -186,6 +180,26 @@ public class ConnectedState extends SelectedDeviceState {
         NoiseTimeout noiseTimeout = new NoiseTimeout();
         Timer timer = new Timer();
         timer.schedule(noiseTimeout, NOISE_TIMEOUT_TIME);
+    }
+
+    private void handleBPMValue(int value) {
+        switch (value) {
+            case -2:
+                deviceActivity.setmDataText(deviceActivity.getString(R.string.no_beat_timeout));
+                initTimeout();
+                break;
+            case -3:
+                deviceActivity.setmDataText(deviceActivity.getString(R.string.no_beat_found));
+                break;
+            case -4:
+                deviceActivity.setmDataText(deviceActivity.getString(R.string.to_many_packet_drops));
+                break;
+            case -5:
+                deviceActivity.setmDataText(deviceActivity.getString(R.string.illegal_data_from_microbit));
+                break;
+            default:
+                deviceActivity.setmDataText(value + " " + deviceActivity.getString(R.string.bpm_text));
+        }
     }
 
 }

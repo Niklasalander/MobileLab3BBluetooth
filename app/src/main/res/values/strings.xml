@@ -14,5 +14,10 @@
     <string name="no_bpm_available">No stable BPM found</string>
     <string name="start_transfer_button">Start</string>
     <string name="stop_transfer_button">Stop</string>
-    <string name="to_much_noise">To much noise, pausing transfer</string>
+    <string name="no_beat_timeout">Cannot find BPM, pausing data transfer</string>
+    <string name="no_beat_found">Cannot find BPM</string>
+    <string name="to_much_noise">To much noise, pausing data transfer</string>
+    <string name="to_many_packet_drops">Too many packets dropped</string>
+    <string name="illegal_data_from_microbit">Cannot receive readable data from microbit</string>
+    <string name="bpm_text">BPM</string>
 </resources>

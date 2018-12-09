@@ -13,17 +13,16 @@ public class DataHandler {
     private static final int minThresLowDefault = 400;
     private static final int averageThresDefault = 650;
     private static final int LIST_SIZE = 20;
+    private static final int TIMEOUT_THRESHOLD = 10000;
+    private static final int TOO_LONG_SINCE_LAST_BEAT = 2000;
     private static DataHandler dataHandler;
-    private int prevSequenceNr;
     private int bpm;
     private long lastBeat;
     private long bpmTimer;
 
     private double stCurrent;
     private double stPrior;
-    private long counter;
     private int bpmcounter;
-    private int lowest;
 
     private double maxThresTop;
     private double maxThresLow;
@@ -59,11 +58,22 @@ public class DataHandler {
         return dataHandler;
     }
 
-    public boolean newValue(String valueStr) {
+    /**
+     * Calculates to BPM for using data from a pulse meter.
+     * Returns
+     * -2 if no beat has been detected within 10 seconds.
+     * -3 if no beat has been detected within 2 seconds.
+     * -4 if not enough packets were received.
+     * -5 if the valueStr does not contain "sequenceNr value".
+     * The BPM if a BPM could be established which is a number greater than 30.
+     * @param valueStr The data. (sequenceNrSPACEvalue).
+     * @return A negative number if no BPM could be established, else a positive BPM.
+     */
+    public int newValue(String valueStr) {
         String[] res = valueStr.split(" ");
         if (res.length != 2) {
             Log.i("DataHandler", "Received data does not include sequenceNr and value");
-            return false;
+            return -5;
         }
         int newSequenceNr = Integer.parseInt(res[0]);
         int newValueNr = Integer.parseInt(res[1]);
@@ -72,10 +82,10 @@ public class DataHandler {
         stPrior = stCurrent;
 
         list.add(stCurrent);
-        if (list.size() > 20)
+        if (list.size() > LIST_SIZE)
             list.remove(0);
         sequenceNrList.add(newSequenceNr);
-        if (sequenceNrList.size() > 20)
+        if (sequenceNrList.size() > LIST_SIZE)
             sequenceNrList.remove(0);
         double maxValue = Collections.max(list);
         double minValue = Collections.min(list);
@@ -105,6 +115,7 @@ public class DataHandler {
             }
         }
 
+
         double divisor = (Calendar.getInstance().getTimeInMillis() - bpmTimer) / 60000.0;
         bpm = (int)Math.round(bpmcounter / divisor);
         Log.i("BPM", "bpmcounter: " + bpmcounter);
@@ -113,16 +124,22 @@ public class DataHandler {
         Log.i("Stcur", "stcurrent : " + stCurrent);
 //        Log.i("BPM", "bpm time : " + (Calendar.getInstance().getTimeInMillis() - bpmTimer));
 //        Log.i("BPM", "lst time : " + (Calendar.getInstance().getTimeInMillis() - lastBeat));
+
+
         if (tooManyDroppedPackets()) {
             Log.i("DataHandler", "Too many dropped packets, returning false");
-            return false;
+            return -4;
+        }
+        if (Calendar.getInstance().getTimeInMillis() - lastBeat > TIMEOUT_THRESHOLD) {
+            Log.i("DataHandler", "No beat found in 10 seconds, too much noise returing false");
+            return -2;
+        }
+        if ((Calendar.getInstance().getTimeInMillis() - lastBeat) > TOO_LONG_SINCE_LAST_BEAT) {
+            Log.i("DataHandler", "Too long since last beat, can't find a bpm");
+            return -3;
         }
 
-        if (Calendar.getInstance().getTimeInMillis() - lastBeat > 10000) {
-            Log.i("DataHandler", "No beat found in 10 seconds, too much noise returing false");
-            return false;
-        }
-        return true;
+        return bpm;
     }
 
     private boolean tooManyDroppedPackets() {
