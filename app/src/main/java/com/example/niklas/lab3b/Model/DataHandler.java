@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.Model;
 
 import android.util.Log;
 
@@ -17,11 +17,13 @@ public class DataHandler {
     private static final int averageThresDefault = 650;
     private static final int LIST_SIZE = 20;
     private static final int TIMEOUT_THRESHOLD = 10000;
+    private static final int TIME_SINCE_LAST_PAUSE_THRES = 16000;
     private static final int TOO_LONG_SINCE_LAST_BEAT = 2000;
     private static DataHandler dataHandler;
     private int bpm;
     private long lastBeat;
     private long bpmTimer;
+    private long timeSinceLastPause;
 
     private double stCurrent;
     private double stPrior;
@@ -49,6 +51,7 @@ public class DataHandler {
     public void reset() {
         bpmTimer = Calendar.getInstance().getTimeInMillis();
         lastBeat = Calendar.getInstance().getTimeInMillis();
+        timeSinceLastPause = Calendar.getInstance().getTimeInMillis();
         bpmcounter = 0;
         stCurrent = 1;
         stPrior = 1;
@@ -125,18 +128,17 @@ public class DataHandler {
         double divisor = (Calendar.getInstance().getTimeInMillis() - bpmTimer) / 60000.0;
         bpm = (int)Math.round(bpmcounter / divisor);
         Log.i("BPM", "bpmcounter: " + bpmcounter);
-//        Log.i("BPM", "divisor: " + divisor);
         Log.i("BPM", "BPM: " + bpm);
         Log.i("Stcur", "stcurrent : " + stCurrent);
-//        Log.i("BPM", "bpm time : " + (Calendar.getInstance().getTimeInMillis() - bpmTimer));
-//        Log.i("BPM", "lst time : " + (Calendar.getInstance().getTimeInMillis() - lastBeat));
 
 
         if (tooManyDroppedPackets()) {
             Log.i("DataHandler", "Too many dropped packets, returning false");
             return -4;
         }
-        if (Calendar.getInstance().getTimeInMillis() - lastBeat > TIMEOUT_THRESHOLD) {
+        if ((Calendar.getInstance().getTimeInMillis() - lastBeat) > TIMEOUT_THRESHOLD &&
+                (Calendar.getInstance().getTimeInMillis() - timeSinceLastPause) > TIME_SINCE_LAST_PAUSE_THRES) {
+            timeSinceLastPause = Calendar.getInstance().getTimeInMillis();
             Log.i("DataHandler", "No beat found in 10 seconds, too much noise returing false");
             return -2;
         }

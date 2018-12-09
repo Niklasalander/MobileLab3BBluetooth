@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -8,10 +8,9 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.os.Handler;
 
-import com.example.niklas.lab3b.DataHandler;
+import com.example.niklas.lab3b.Model.DataHandler;
 import com.example.niklas.lab3b.DeviceActivity;
 import com.example.niklas.lab3b.MainActivity;
-import com.example.niklas.lab3b.R;
 
 import java.util.UUID;
 
@@ -55,8 +54,6 @@ public class SelectedDeviceState extends BTConnectionState {
     public BTConnectionState disconnectDevice() {
         stopTransfer();
         if (mBluetoothGatt != null)
-            mBluetoothGatt.disconnect();
-        if (mBluetoothGatt != null)
             mBluetoothGatt.close();
         if (dataHandler != null)
             dataHandler.reset();
@@ -75,14 +72,4 @@ public class SelectedDeviceState extends BTConnectionState {
             mBluetoothGatt.writeDescriptor(descriptor);
         }
     }
-
-/*    @Override
-    public void stopTransfer() {
-        if (mBluetoothGatt != null) {
-            mBluetoothGatt.disconnect();
-            if (dataHandler != null)
-                dataHandler.reset();
-            handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.no_bpm_available)));
-        }
-    }*/
 }

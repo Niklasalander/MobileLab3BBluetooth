@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -48,8 +48,8 @@ public class BTConnectionState {
      * Starts a scan for BLE devices
      * @param enable True is scan is to be made, else false
      */
-    public void scanLeDevice(final boolean enable) {
-
+    public boolean scanLeDevice(final boolean enable) {
+        return false;
     }
 
     /**

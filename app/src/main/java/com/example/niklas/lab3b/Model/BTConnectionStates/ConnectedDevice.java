@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.bluetooth.BluetoothDevice;
 
@@ -27,6 +27,9 @@ class ConnectedDevice {
         }
     }
 
+    /**
+     * The device will be null.
+     */
     static void removeInstance() {
         synchronized(lock) {
             theDevice = null;

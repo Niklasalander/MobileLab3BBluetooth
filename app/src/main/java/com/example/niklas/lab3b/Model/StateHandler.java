@@ -1,9 +1,11 @@
-package com.example.niklas.lab3b;
+package com.example.niklas.lab3b.Model;
 
 import android.bluetooth.BluetoothDevice;
 
-import com.example.niklas.lab3b.BTConnectionStates.BTConnectionState;
-import com.example.niklas.lab3b.BTConnectionStates.ScanForDeviceState;
+import com.example.niklas.lab3b.Model.BTConnectionStates.BTConnectionState;
+import com.example.niklas.lab3b.Model.BTConnectionStates.ScanForDeviceState;
+import com.example.niklas.lab3b.DeviceActivity;
+import com.example.niklas.lab3b.MainActivity;
 
 /**
  * This class is used to handle the state machine which is used to
@@ -12,11 +14,6 @@ import com.example.niklas.lab3b.BTConnectionStates.ScanForDeviceState;
  */
 public class StateHandler {
     private static BTConnectionState btConnectionState;
-    private StateHandler stateHandler;
-
-//    public StateHandler getInstance() {
-//        if (stateHandler == null)
-//    }
 
     /**
      * This creates the state machine, must be called first to establish a
@@ -43,9 +40,10 @@ public class StateHandler {
      * Starts a scan for BLE devices
      * @param enable True is scan is to be made, else false
      */
-    public static void scanLeDevice(boolean enable) {
+    public static boolean scanLeDevice(boolean enable) {
         if (btConnectionState != null)
-            btConnectionState.scanLeDevice(enable);
+            return btConnectionState.scanLeDevice(enable);
+        return false;
     }
 
     /**

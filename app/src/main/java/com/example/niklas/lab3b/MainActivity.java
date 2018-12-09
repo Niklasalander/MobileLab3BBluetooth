@@ -6,15 +6,17 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.niklas.lab3b.Model.StateHandler;
 
 import java.util.ArrayList;
 
@@ -51,11 +53,13 @@ public class MainActivity extends AppCompatActivity {
      * Tries to initiate BLE.
      * If bluetooth is not on, start an activity for the user to start BLE.
      */
-    private void initBLE() {
+    private boolean initBLE() {
         if (!StateHandler.initBLE()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            return false;
         }
+        return true;
     }
 
     // callback for ActivityCompat.requestPermissions
@@ -98,6 +102,16 @@ public class MainActivity extends AppCompatActivity {
         StateHandler.onDeviceSelected(mDeviceList.get(position));
     }
 
+    /**
+     * When the Scan for device button is clicked.
+     */
+    private void handleScanButtonClick() {
+        mDeviceList.clear();
+        if (!StateHandler.scanLeDevice(true)) {
+            if (initBLE())
+                StateHandler.scanLeDevice(true);
+        }
+    }
 
     /**
      * Below: Manage activity, and hence bluetooth, life cycle,
@@ -112,12 +126,8 @@ public class MainActivity extends AppCompatActivity {
         mScanInfoView = findViewById(R.id.scanInfo);
 
         Button startScanButton = findViewById(R.id.startScanButton);
-        startScanButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mDeviceList.clear();
-                StateHandler.scanLeDevice(true);
-            }
+        startScanButton.setOnClickListener(v -> {
+            handleScanButtonClick();
         });
 
         ListView scanListView = findViewById(R.id.scanListView);
@@ -135,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        Log.i("MainActivity", "OnStart");
         initBLE();
     }
 

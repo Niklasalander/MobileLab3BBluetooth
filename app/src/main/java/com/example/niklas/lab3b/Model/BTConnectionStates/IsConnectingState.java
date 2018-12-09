@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;

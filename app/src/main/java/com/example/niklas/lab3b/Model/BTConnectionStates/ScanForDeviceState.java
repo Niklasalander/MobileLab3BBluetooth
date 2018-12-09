@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 
 import com.example.niklas.lab3b.DeviceActivity;
@@ -20,8 +21,6 @@ import static com.example.niklas.lab3b.MainActivity.REQUEST_ACCESS_LOCATION;
  */
 public class ScanForDeviceState extends BTConnectionState {
     private static final long SCAN_PERIOD = 5000;
-//    private Handler handler;
-//    private MainActivity mainActivity;
     private boolean mScanning;
 
     public ScanForDeviceState(MainActivity mainActivity) {
@@ -47,24 +46,22 @@ public class ScanForDeviceState extends BTConnectionState {
                 // the callback method onRequestPermissionsResult gets the result of this request
             }
         }
-
+        Log.i("MainActivity", "InitBLE");
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // turn on BT
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
-//            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
             return false;
         }
         return true;
 
     }
 
-    /*
-     * Scan for BLE devices.
-     */
+
     @Override
-    public void scanLeDevice(final boolean enable) {
+    public boolean scanLeDevice(final boolean enable) {
+        if (mBluetoothAdapter == null)
+            return false;
         if (enable) {
             if (!mScanning) {
                 // stop scanning after a pre-defined scan period, SCAN_PERIOD
@@ -95,11 +92,11 @@ public class ScanForDeviceState extends BTConnectionState {
                 handler.post(() -> showToast("BLE scan stopped"));
             }
         }
+        return true;
     }
 
     @Override
     public BTConnectionState onDeviceSelected(BluetoothDevice device) {
-//        ConnectedDevice.setInstance(device);
         ConnectedDevice.setInstance(device);
         connectedDevice = ConnectedDevice.getInstance();
         showToast(ConnectedDevice.getInstance().toString());

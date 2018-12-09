@@ -1,4 +1,4 @@
-package com.example.niklas.lab3b.BTConnectionStates;
+package com.example.niklas.lab3b.Model.BTConnectionStates;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -15,7 +15,7 @@ import com.example.niklas.lab3b.DeviceActivity;
 import com.example.niklas.lab3b.MainActivity;
 import com.example.niklas.lab3b.NoiseTimeout;
 import com.example.niklas.lab3b.R;
-import com.example.niklas.lab3b.StateHandler;
+import com.example.niklas.lab3b.Model.StateHandler;
 
 import java.util.List;
 import java.util.Timer;
@@ -61,7 +61,6 @@ public class ConnectedState extends SelectedDeviceState {
                 handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.connected_msg)));
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.i("BluetoothGattCallback", "new state diss");
-                connectedDevice.connectGatt(mainActivity,true,mBtGattCallback);
                 mBluetoothGatt = null;
                 handler.post(() -> deviceActivity.setmDataText(deviceActivity.getString(R.string.disconnected_msg)));
                 StateHandler.disconnectDevice();
@@ -132,7 +131,7 @@ public class ConnectedState extends SelectedDeviceState {
         @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic
                 characteristic) {
-            Log.i("BluetoothGattCallback", "onCharacteristicChanged: " + characteristic.toString());
+            Log.i("CharacteristicChanged", "onCharacteristicChanged: " + characteristic.toString());
 
             // TODO: check which service and characteristic caused this call
             BluetoothGattCharacteristic uartTxCharacteristic =
@@ -165,10 +164,6 @@ public class ConnectedState extends SelectedDeviceState {
 
     @Override
     public void startTransfer() {
-/*        if (mBluetoothGatt != null) {
-            if (mBluetoothGatt.getConnectionState(connectedDevice) == BluetoothGatt.STATE_DISCONNECTED)
-                mBluetoothGatt.connect();
-        }*/
         if (mBluetoothGatt != null && mUartService != null) {
             BluetoothGattCharacteristic txCharac =
                     mUartService.getCharacteristic(UART_TX_CHARACTERISTIC_UUID);
@@ -188,6 +183,7 @@ public class ConnectedState extends SelectedDeviceState {
                     txCharac.getDescriptor(CLIENT_CHARACTERISTIC_CONFIG);
             descriptor.setValue(BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE);
             mBluetoothGatt.writeDescriptor(descriptor);
+            handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.user_stopped_transfer)));
         }
     }
 
@@ -199,23 +195,28 @@ public class ConnectedState extends SelectedDeviceState {
         timer.schedule(noiseTimeout, NOISE_TIMEOUT_TIME);
     }
 
+    /**
+     * Updates the view depending on what can be presented using collected values.
+     * @param value The value that contains what can be presented.
+     */
     private void handleBPMValue(int value) {
         switch (value) {
             case -2:
-                deviceActivity.setmDataText(deviceActivity.getString(R.string.no_beat_timeout));
+                handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.no_beat_timeout)));
                 initTimeout();
                 break;
             case -3:
-                deviceActivity.setmDataText(deviceActivity.getString(R.string.no_beat_found));
+                handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.no_beat_found)));
                 break;
             case -4:
-                deviceActivity.setmDataText(deviceActivity.getString(R.string.to_many_packet_drops));
+                handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.to_many_packet_drops)));
                 break;
             case -5:
-                deviceActivity.setmDataText(deviceActivity.getString(R.string.illegal_data_from_microbit));
+                handler.post(() -> deviceActivity.setBpmTextView(deviceActivity.getString(R.string.illegal_data_from_microbit)));
                 break;
             default:
-                deviceActivity.setmDataText(value + " " + deviceActivity.getString(R.string.bpm_text));
+                handler.post(() -> deviceActivity.setBpmTextView(value + " " + deviceActivity.getString(R.string.bpm_text)));
+
         }
     }
 
